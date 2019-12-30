@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: waxapi-svc
+  labels:
+    app: waxapi-svc
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 443
+      name: https
+      targetPort: 9999
+    - port: 9876
+      name: p2p
+      targetPort: 9876
+  selector:
+    app: waxapi
