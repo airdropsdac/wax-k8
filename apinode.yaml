@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jsr-wax-api1
+spec:
+  serviceName: "waxapi-demo"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: waxapi
+  template:
+    metadata:
+      labels:
+        app: waxapi
+    spec:
+      nodeName: node1
+      containers:
+      - name: waxapi
+        image: waxteam/production:wax-1.8.4-1.0.0
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/bash
+        - -ce
+        - nodeos --disable-replay-opts --data-dir /data/waxapinode --config /opt/waxconfig/config.ini
+        ports:
+        - containerPort: 9999
+          name: web
+          protocol: TCP
+        - containerPort: 9876
+          name: p2p
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /data/waxapinode
+          name: apinode1
+        - mountPath: /opt/waxconfig
+          name: configvol
+        - mountPath: /opt/ssl
+          name: ssl
+volumes:
+      - name: ssl
+        secret:
+          secretName: wax-certs
+      - hostPath:
+          path: /data/waxapinode
+          type: Directory
+        name: apinode1
+      - configMap:
+          name: wax-config
+        name: configvol
